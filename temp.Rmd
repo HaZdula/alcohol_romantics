@@ -1,0 +1,80 @@
+---
+title: "Eksploracja"
+author: "Jakub Wiśniewski"
+date: "3/14/2020"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+students.all <- read.csv("~/github/alcohol_romantics/students-all.csv")
+
+students.all$Dalc <- as.factor(students.all$Dalc)
+students.all$Walc <- as.factor(students.all$Walc)
+
+
+
+```
+
+```{r}
+students.all$failures <- as.factor(students.all$failures)
+```
+
+```{r}
+ggplot(students.all, aes(G3, fill = romantic)) + geom_density(alpha = 0.3)
+```
+```{r}
+
+ggplot(students.all,  aes(G3, fill = Dalc)) + geom_density(alpha = 0.4)
+```
+
+```{r}
+ggplot(students.all, aes(G3, fill = Walc)) + geom_density(alpha = 0.4)
+```
+
+```{r}
+students.all %>% 
+  group_by(Walc, romantic) %>%
+  summarise(n = n()) %>% 
+  mutate(perc = n/sum(students.all$romantic == "yes")) %>% 
+  merge(students.all[students.all$romantic == "yes",], by=c("Walc","romantic")) -> wr1
+
+students.all %>% 
+  group_by(Walc, romantic) %>%
+  summarise(n = n()) %>% 
+  mutate(perc = n/sum(students.all$romantic == "no")) %>% 
+  merge(students.all[students.all$romantic == "no",], by=c("Walc","romantic")) -> wr2
+
+wr <- rbind(wr1,wr2)
+
+ggplot(wr, aes(romantic,perc, fill = Walc)) + geom_bar(position = "dodge", stat = "identity")
+```
+```{r}
+students.all %>% 
+  group_by(Dalc, romantic) %>%
+  summarise(n = n()) %>% 
+  mutate(perc = n/sum(students.all$romantic == "yes")) %>% 
+  merge(students.all[students.all$romantic == "yes",], by=c("Dalc","romantic")) -> wr1
+
+students.all %>% 
+  group_by(Dalc, romantic) %>%
+  summarise(n = n()) %>% 
+  mutate(perc = n/sum(students.all$romantic == "no")) %>% 
+  merge(students.all[students.all$romantic == "no",], by=c("Dalc","romantic")) -> wr2
+
+wr <- rbind(wr1,wr2)
+
+ggplot(wr, aes(romantic,perc, fill = Dalc)) + geom_bar(position = "dodge", stat = "identity")
+```
+
+
+```{r}
+ggplot(students.all, aes(absences, fill = romantic)) + geom_density(alpha = 0.5)
+```
+
+```{r}
+ggplot(students.all, aes(absences, G3, fill = romantic)) + geom_density2d(alpha = 0.5)
+```
+
