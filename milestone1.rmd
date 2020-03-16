@@ -2,15 +2,21 @@
 title: "Milestone_1"
 author: "Hanna Zdulska"
 date: "3/14/2020"
-output: html_document
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Zbiór
+# Zbiór
 
+## Opis
 Context:
 The data were obtained in a survey of students math and portuguese language courses in secondary school. It contains a lot of interesting social, gender and study information about students. You can use it for some EDA or try to predict students final grade.
 
@@ -84,13 +90,16 @@ ptable <- function(s1, s2){
 You can also embed plots, for example:
 
 ```{r}
-head(df) %>% knitr::kable()
+slices <- which(colnames(df)  %in% c("age", "failures", "absences", "G1", "G2", "G3"))
+df[, -slices] <- lapply(df[, -slices], as.factor)
+head(df)
 summary(df)
-
-slices <- which(colnames(df) %in% c("Medu", "Fedu", "famrel", "freetime", "freetime", "goout", "Dalc", "Walc", "health", ))
-
-df[, slices] <- lapply(df[, slices], as.factor)
 ```
+
+```{r}
+DataExplorer::plot_bar(df)
+```
+
 
 ```{r}
 DataExplorer::plot_histogram(df)
@@ -101,33 +110,66 @@ DataExplorer::plot_histogram(df)
 ```{r}
 DataExplorer::plot_density(df)
 ```
+```{r}
+DataExplorer::plot_boxplot(df, by = "romantic")
+```
+
 
 ```{r}
-ggplot(df, aes(x = traveltime, y=studytime, color = romantic)) + geom_jitter()
-colnames(df)
-ggplot(df, aes(x = Dalc, y=Walc, color = romantic)) + geom_jitter()
+DataExplorer::plot_boxplot(df, by = "romantic")
+```
 
+```{r}
+# to nie wiem czy zatrzymywać
+# kto ile studjuje/podróżuje
+ggplot(df, aes(x = traveltime, y=studytime, color = romantic)) + geom_jitter()
+# raczej nie widać nic specjalnie
+
+ggplot(df, aes(x = Dalc, y=Walc, color = romantic)) + geom_jitter()
+# tendencja do picia w weekendy, ale wytrywali romantycy w [4,5] Dalc
+
+# rozkład wyników w zależności od związku
 ggplot(df, aes(x = G1, color = romantic)) + geom_density()
 ggplot(df, aes(x = G2, color = romantic)) + geom_density()
 ggplot(df, aes(x = G3, color = romantic)) + geom_density()
+# rośnie ogon niezdawalności -> u romantyków jakby bardziej no no 
 
+
+# kto pije więcej, ale to ludzie, a nie procentowo
 ggplot(df, aes(x = Dalc, fill = romantic)) + geom_bar(position='dodge')
 ggplot(df, aes(x = Walc, fill = romantic)) + geom_bar(position='dodge')
 
 
-ggplot(df, aes())
 ```
 ```{r}
+# kto pije więcej procentowo ?
 tab <- table(df[,c("romantic", "Walc")])
 x <- as.data.frame(prop.table(tab, 1)*100)
 ggplot(x, aes(x = Walc, y = Freq, fill = romantic)) + geom_bar(position = "dodge", stat = "identity")
+# no widać, że walą w weekendy po równo
 
+# a w normalne dni?
 tab <- table(df[,c("romantic", "Dalc")])
 x <- as.data.frame(prop.table(tab, 1)*100)
 ggplot(x, aes(x = Dalc, y = Freq, fill = romantic)) + geom_bar(position = "dodge", stat = "identity")
+# delikatnie romantycy więcej
+```
+```{r}
+# A łącznie? wg ludzi (sumarycznie Walc + Dalc)
+ggplot(df, aes(x = as.integer(Walc) + as.integer(Dalc), fill = romantic )) + geom_bar(position = "dodge")
+
+df2 <- df %>% 
+  group_by(romantic) %>%
+  transmute(alc = as.integer(Dalc) + as.integer(Walc))
+x <- as.data.frame(prop.table(table(df2), 1)*100)
+
+# procentowo
+ggplot(x, aes(x = alc, y = Freq, fill = romantic)) + geom_bar(position = "dodge", stat = "identity")
+# no jakby romantycy więcej walili
 ```
 
 ```{r}
+# A w zależności od kierunku? wg ludzi (sumarycznie Walc + Dalc)
 ggplot(df, aes(x = as.integer(Walc) + as.integer(Dalc), fill = major )) + geom_bar(position = "dodge")
 
 df2 <- df %>% 
@@ -135,35 +177,37 @@ df2 <- df %>%
   transmute(alc = as.integer(Dalc) + as.integer(Walc))
 x <- as.data.frame(prop.table(table(df2), 1)*100)
 
-
+# procentowo
 ggplot(x, aes(x = alc, y = Freq, fill = major)) + geom_bar(position = "dodge", stat = "identity")
+# no równo no!
 ```
 
 ```{r}
+# to może mają więcej nieobecności
 ggplot(df, aes(x = absences, color = romantic)) + geom_density() + facet_grid(major~Walc)
+# no i jakby ci bardziej pijani mieli więcej nieobecności
+# ale czy to jesy wystarczająca próbka? Może jest tylko po 3 osoby pijące na lvl5?
 table(df[,c("major", "Walc")])
 
+# A w Dalc?
 ggplot(df, aes(x = absences, color = romantic)) + geom_density() + facet_grid(major~Dalc)
+# jakby bardziej się obijało na nieobecnościach
+
 table(df[,c("major", "Dalc")])
-
+# Ale to jednak mała próbka
 ```
 
-```{r}
-DataExplorer::plot_boxplot(df, by = "romantic")
-```
-```{r}
-DataExplorer::plot_qq(df)
-```
 
 ```{r}
+# to może gdzie mieszkają ma wpływ?
 ggplot(df, aes(G3, color = romantic)) + geom_density() + facet_wrap(~address)
-ggplot(df, aes(G3, color = romantic)) + geom_density() + facet_wrap(~Dalc)
-table(df[, c("Dalc", "romantic")])
-```
+# no też nie do końca...
 
-```{r}
-# zle
-x <- ptable("goout", "major")
-ggplot(x, aes(x = goout, y = Freq, fill = major)) + geom_bar(stat="identity", position = "dodge")
+# A jak picie w dniach tygodnia ma odbicie na ocenach?
+ggplot(df, aes(G1, color = romantic)) + geom_density() + facet_wrap(~Dalc)
+ggplot(df, aes(G2, color = romantic)) + geom_density() + facet_wrap(~Dalc)
+ggplot(df, aes(G3, color = romantic)) + geom_density() + facet_wrap(~Dalc)
+# sprawdzmy próbkę
+table(df[, c("Dalc", "romantic")])
 ```
 
