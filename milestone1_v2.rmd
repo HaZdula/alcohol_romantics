@@ -110,6 +110,11 @@ Tak prezentują się zaś gęstości zmiennych ciągłych. Najbardziej podobne d
 DataExplorer::plot_density(df)
 ```
 
+```{r}
+DataExplorer::plot_qq(df)
+```
+
+
 Popatrzmy teraz przez pryzmat zmiennej `romantic` oznaczającej czy osoba jest w związku. Zwróćmy uwagę na wykres w stosunku do wieku. Mediana wieku osób będących w związku przewyższa o około rok medianę wieku osób niebędących w związku. Możemy dopatrzeć się również delikatnie lepszych wyników końcowych (G3) osób niebędących w związku.
 ```{r}
 DataExplorer::plot_boxplot(df, by = "romantic")
@@ -120,7 +125,7 @@ Kto mało pije w weekendy ten w tygodniu też mało pije. Czy wszyscy? Wśród o
 ```{r}
 # tendencja do picia w weekendy, ale wytrywali romantycy w [4,5] Dalc
 ggplot(df, aes(x = Dalc, y=Walc, fill = romantic)) + geom_jitter(shape =21, size = 2.5) +
-  scale_fill_manual(values = c("#f0aa07", "#b303ff"  )) + theme_bw()
+  scale_fill_manual(values = c("#f0aa07", "#b303ff"  )) + theme_bw() + ylab("Weekendowa konsumpcja") + xlab("Konsumpcja w trakcie tygodnia") + ggtitle("Spożywanie alkoholu w trakcie tygodnia")
 ```
 
 
