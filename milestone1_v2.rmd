@@ -120,6 +120,9 @@ Popatrzmy teraz przez pryzmat zmiennej `romantic` oznaczającej czy osoba jest w
 DataExplorer::plot_boxplot(df, by = "romantic")
 ```
 
+```{r}
+DataExplorer::plot_correlation(df)
+```
 
 Kto mało pije w weekendy ten w tygodniu też mało pije. Czy wszyscy? Wśród osób które piją więcej w tygodniu, a mniej na weekendzie są prawie wyłącznie osoby w związku! Poza tym widzimy, że studenci wolą konsumować alkohol podczas weekendu.
 ```{r}
