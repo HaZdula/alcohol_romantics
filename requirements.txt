@@ -7,7 +7,7 @@ google-auth-oauthlib==0.4.1
 google-pasta==0.2.0
 googleapis-common-protos==1.51.0
 matplotlib==3.2.1
-numpy==1.17.4
+numpy==1.22.0
 pandas==0.25.3
 pandas-profiling==2.5.3
 pickleshare==0.7.5
